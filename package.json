@@ -1,0 +1,43 @@
+{
+  "name": "albumish",
+  "version": "0.1.0",
+  "description": "A cross-platform desktop app for quickly shortlisting photos with swipe, keyboard, and copy workflow.",
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "package:mac": "electron-builder --mac",
+    "package:win": "electron-builder --win",
+    "package:all": "electron-builder --mac --win"
+  },
+  "keywords": [
+    "photos",
+    "shortlist",
+    "electron",
+    "desktop"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^38.4.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.albumish.app",
+    "productName": "Albumish",
+    "files": [
+      "electron/**/*",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.photography"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
