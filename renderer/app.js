@@ -23,18 +23,21 @@ const fileKinds = "JPG, PNG, GIF, WebP, BMP, TIFF, HEIC";
 
 function reviewedCount() {
   if (!state.session) return 0;
-  return state.session.selected.length + state.session.rejected.length + state.session.skipped.length;
+  return state.session.currentIndex;
 }
 
 function currentPhoto() {
   if (!state.session) return null;
-  return state.session.photos[state.session.currentIndex] || null;
+  return state.session.reviewQueue[state.session.currentIndex] || null;
 }
 
 function normalizeSession(session) {
   return {
     sourceFolder: "",
     photos: [],
+    reviewQueue: [],
+    reviewRound: 1,
+    targetCount: null,
     selected: [],
     rejected: [],
     skipped: [],
@@ -42,6 +45,9 @@ function normalizeSession(session) {
     history: [],
     currentIndex: 0,
     ...session,
+    reviewQueue: session.reviewQueue || session.photos || [],
+    reviewRound: session.reviewRound || 1,
+    targetCount: session.targetCount || null,
     selected: session.selected || [],
     rejected: session.rejected || [],
     skipped: session.skipped || [],
@@ -60,7 +66,23 @@ function currentRotation(photo = currentPhoto()) {
 }
 
 function isReviewComplete() {
-  return state.session && state.session.currentIndex >= state.session.photos.length;
+  if (!state.session || !state.session.targetCount) return false;
+  return state.session.selected.length >= state.session.targetCount || state.session.currentIndex >= state.session.reviewQueue.length;
+}
+
+function shouldStartAnotherRound() {
+  if (!state.session) return false;
+  return state.session.selected.length < state.session.targetCount && state.session.currentIndex >= state.session.reviewQueue.length && state.session.rejected.length > 0;
+}
+
+function startAnotherRound() {
+  const rejectedPaths = new Set(state.session.rejected);
+  state.session.reviewQueue = state.session.photos.filter((photo) => rejectedPaths.has(photo.path));
+  state.session.rejected = [];
+  state.session.skipped = [];
+  state.session.history = [];
+  state.session.currentIndex = 0;
+  state.session.reviewRound += 1;
 }
 
 function classNames(...items) {
@@ -101,7 +123,7 @@ async function chooseSourceFolder() {
   try {
     const result = await window.photoApp.chooseSourceFolder();
     if (!result) {
-      setView(state.session ? "review" : "welcome");
+      setView(state.session ? (state.session.targetCount ? "review" : "target") : "welcome");
       return;
     }
 
@@ -112,7 +134,7 @@ async function chooseSourceFolder() {
     state.copyProgress = null;
     state.copyResult = null;
     state.imageError = "";
-    setView(state.session.photos.length ? "review" : "empty");
+    setView(state.session.photos.length ? "target" : "empty");
   } catch (error) {
     showError(error.message);
   }
@@ -131,6 +153,30 @@ function goHome() {
   state.isTransitioning = false;
   state.enterDirection = "";
   setView("welcome");
+}
+
+async function startTargetReview() {
+  const input = document.querySelector("[data-target-count]");
+  const targetCount = Number.parseInt(input?.value, 10);
+  const maxCount = state.session?.photos.length || 0;
+
+  if (!Number.isInteger(targetCount) || targetCount < 1 || targetCount > maxCount) {
+    state.targetError = `Enter a number from 1 to ${maxCount}.`;
+    render();
+    return;
+  }
+
+  state.session.targetCount = targetCount;
+  state.session.reviewQueue = state.session.photos;
+  state.session.reviewRound = 1;
+  state.session.currentIndex = 0;
+  state.session.selected = [];
+  state.session.rejected = [];
+  state.session.skipped = [];
+  state.session.history = [];
+  state.targetError = "";
+  await persistSession();
+  setView("review");
 }
 
 async function rotateCurrentPhoto(delta) {
@@ -189,6 +235,10 @@ async function decide(action) {
   state.imageError = "";
   state.enterDirection = action === "selected" ? "right" : "left";
 
+  if (shouldStartAnotherRound()) {
+    startAnotherRound();
+  }
+
   state.view = isReviewComplete() ? "complete" : "review";
   render();
   try {
@@ -231,6 +281,9 @@ async function skipCorruptPhoto() {
     at: new Date().toISOString()
   });
   state.session.currentIndex += 1;
+  if (shouldStartAnotherRound()) {
+    startAnotherRound();
+  }
   await persistSession();
   setView(isReviewComplete() ? "complete" : "review");
 }
@@ -397,6 +450,23 @@ function renderWelcome() {
   `);
 }
 
+function renderTarget() {
+  renderShell(`
+    <section class="target-layout">
+      <div class="target-panel">
+        <h2>How many photos do you want to finalize?</h2>
+        <p>You have ${state.session.photos.length} photos. Albumish will loop through passed photos again until you reach your target.</p>
+        <label>
+          <span>Target photos</span>
+          <input data-target-count type="number" min="1" max="${state.session.photos.length}" placeholder="300" autofocus />
+        </label>
+        ${state.targetError ? `<p class="target-error">${escapeHtml(state.targetError)}</p>` : ""}
+        <button class="primary large" data-action="start-target">Start Review</button>
+      </div>
+    </section>
+  `);
+}
+
 function renderLoading() {
   renderShell(`
     <section class="center-state">
@@ -423,7 +493,7 @@ function renderReview() {
     return;
   }
 
-  const total = state.session.photos.length;
+  const total = state.session.reviewQueue.length;
   const reviewed = reviewedCount();
   const progressPercent = total ? Math.round((reviewed / total) * 100) : 0;
   const rotation = currentRotation(photo);
@@ -433,13 +503,13 @@ function renderReview() {
       <section class="review-status-bar">
         <div class="review-progress">
           <div class="progress-copy">
-            <span>${reviewed} of ${total}</span>
+            <span>Round ${state.session.reviewRound} · ${reviewed} of ${total}</span>
             <strong>${progressPercent}%</strong>
           </div>
           <div class="progress-track"><span style="width:${progressPercent}%"></span></div>
         </div>
         <dl class="review-stat-pills">
-          <div class="chosen-pill" title="Chosen"><dt aria-label="Chosen">♥</dt><dd>${state.session.selected.length}</dd></div>
+          <div class="chosen-pill" title="Chosen"><dt aria-label="Chosen">♥</dt><dd>${state.session.selected.length}/${state.session.targetCount}</dd></div>
           <div class="passed-pill" title="Passed"><dt aria-label="Passed">×</dt><dd>${state.session.rejected.length}</dd></div>
         </dl>
       </section>
@@ -468,10 +538,10 @@ function renderComplete() {
   renderShell(`
     <section class="complete-layout">
       <div class="summary">
-        <h2>Review complete</h2>
+        <h2>${state.session.selected.length >= state.session.targetCount ? "Target reached" : "Review complete"}</h2>
         <dl class="summary-grid">
-          <div><dt>Total reviewed</dt><dd>${reviewedCount()} / ${total}</dd></div>
-          <div><dt>Chosen</dt><dd>${state.session.selected.length}</dd></div>
+          <div><dt>Total photos</dt><dd>${total}</dd></div>
+          <div><dt>Chosen</dt><dd>${state.session.selected.length} / ${state.session.targetCount}</dd></div>
           <div><dt>Passed</dt><dd>${state.session.rejected.length}</dd></div>
         </dl>
       </div>
@@ -531,6 +601,7 @@ function renderError() {
 
 function render() {
   if (state.view === "loading") renderLoading();
+  if (state.view === "target") renderTarget();
   if (state.view === "welcome") renderWelcome();
   if (state.view === "empty") renderEmpty();
   if (state.view === "review") renderReview();
@@ -567,6 +638,7 @@ appRoot.addEventListener("click", (event) => {
   if (!action) return;
 
   if (action === "choose-source") chooseSourceFolder();
+  if (action === "start-target") startTargetReview();
   if (action === "home") goHome();
   if (action === "select") decide("selected");
   if (action === "reject") decide("rejected");
@@ -578,7 +650,14 @@ appRoot.addEventListener("click", (event) => {
   if (action === "skip-corrupt") skipCorruptPhoto();
 });
 
-window.addEventListener("keydown", handleKeydown);
+window.addEventListener("keydown", (event) => {
+  if (state.view === "target" && event.key === "Enter") {
+    event.preventDefault();
+    startTargetReview();
+    return;
+  }
+  handleKeydown(event);
+});
 
 window.photoApp.onCopyProgress((progress) => {
   state.copyProgress = progress;
@@ -592,7 +671,7 @@ async function boot() {
       state.session = normalizeSession(result.session);
       state.sessionPath = result.sessionPath;
       state.selectedPath = result.selectedPath;
-      state.view = isReviewComplete() ? "complete" : "review";
+      state.view = state.session.targetCount ? (isReviewComplete() ? "complete" : "review") : "target";
     } else {
       state.view = "welcome";
     }

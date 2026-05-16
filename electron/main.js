@@ -76,6 +76,9 @@ function makeInitialSession(sourceFolder, photos) {
   return {
     sourceFolder,
     photos,
+    reviewQueue: photos,
+    reviewRound: 1,
+    targetCount: null,
     selected: [],
     rejected: [],
     skipped: [],
@@ -98,6 +101,9 @@ async function writeSession(session) {
     history: [],
     currentIndex: 0,
     ...session,
+    reviewQueue: session.reviewQueue || session.photos || [],
+    reviewRound: session.reviewRound || 1,
+    targetCount: session.targetCount || null,
     rotations: session.rotations || {},
     updatedAt: new Date().toISOString()
   };

@@ -273,6 +273,61 @@ button:disabled {
   margin-bottom: 18px;
 }
 
+.target-layout {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+  padding: 32px;
+}
+
+.target-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.12);
+  display: grid;
+  gap: 16px;
+  max-width: 460px;
+  padding: 24px;
+  width: 100%;
+}
+
+.target-panel h2,
+.target-panel p {
+  margin: 0;
+}
+
+.target-panel p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.target-panel label {
+  display: grid;
+  gap: 8px;
+}
+
+.target-panel label span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.target-panel input {
+  background: rgb(255 255 255 / 0.88);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font: inherit;
+  min-height: 46px;
+  padding: 0 14px;
+}
+
+.target-panel .target-error {
+  color: var(--red);
+  font-size: 13px;
+}
+
 .center-state {
   align-items: center;
   display: flex;
