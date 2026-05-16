@@ -2,6 +2,10 @@
 
 **Worried about shortlisting hundreds of wedding photos? Albumish helps you quickly review, choose, and copy the photos worth keeping.**
 
+## Quick Demo
+
+Watch Albumish in action: https://youtu.be/-1A9KQHEibQ
+
 Albumish is a desktop photo-shortlisting app for the moment after a big shoot, trip, event, or wedding album lands on your computer and you realize you now have hundreds or thousands of photos to review.
 
 Instead of opening files one by one in Finder or File Explorer, Albumish lets you move through a folder quickly:
