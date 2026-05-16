@@ -118,6 +118,21 @@ async function chooseSourceFolder() {
   }
 }
 
+function goHome() {
+  if (state.view === "copying") return;
+
+  state.session = null;
+  state.sessionPath = "";
+  state.selectedPath = "";
+  state.destinationFolder = "";
+  state.copyProgress = null;
+  state.copyResult = null;
+  state.imageError = "";
+  state.isTransitioning = false;
+  state.enterDirection = "";
+  setView("welcome");
+}
+
 async function rotateCurrentPhoto(delta) {
   const photo = currentPhoto();
   if (!photo || isReviewComplete()) return;
@@ -336,14 +351,19 @@ function pointerUp(event) {
 }
 
 function renderShell(content) {
+  const canGoHome = Boolean(state.session) && state.view !== "welcome" && state.view !== "loading";
+
   appRoot.innerHTML = `
-    <section class="app-shell">
+    <section class="app-shell view-${state.view}">
       <header class="topbar">
         <div>
           <h1>Albumish</h1>
           <p>${escapeHtml(state.session?.sourceFolder || "Choose a folder and start reviewing.")}</p>
         </div>
-        <button class="ghost" data-action="choose-source">Choose Folder</button>
+        <div class="topbar-actions">
+          ${canGoHome ? `<button class="ghost" data-action="home">Home</button>` : ""}
+          <button class="ghost" data-action="choose-source">Choose Folder</button>
+        </div>
       </header>
       ${content}
     </section>
@@ -547,6 +567,7 @@ appRoot.addEventListener("click", (event) => {
   if (!action) return;
 
   if (action === "choose-source") chooseSourceFolder();
+  if (action === "home") goHome();
   if (action === "select") decide("selected");
   if (action === "reject") decide("rejected");
   if (action === "undo") undo();

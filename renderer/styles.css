@@ -52,10 +52,45 @@ button:disabled {
 }
 
 .app-shell {
+  background: var(--bg);
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100vh;
+  isolation: isolate;
   overflow: hidden;
+  position: relative;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.app-shell::before {
+  background:
+    url("./albumish-backdrop.png") center / cover no-repeat;
+  filter: saturate(0.88);
+  opacity: 0.2;
+  transform: scale(1.02);
+}
+
+.app-shell::after {
+  background: rgb(245 245 247 / 0.82);
+}
+
+.app-shell.view-welcome::before {
+  filter: saturate(1);
+  opacity: 1;
+}
+
+.app-shell.view-welcome::after {
+  background:
+    linear-gradient(90deg, rgb(7 11 18 / 0.86), rgb(7 11 18 / 0.56) 48%, rgb(7 11 18 / 0.66)),
+    linear-gradient(180deg, rgb(7 11 18 / 0.18), rgb(7 11 18 / 0.5));
 }
 
 .topbar {
@@ -96,6 +131,12 @@ button:disabled {
   white-space: nowrap;
 }
 
+.topbar-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
 .primary {
   background: var(--blue);
   color: #ffffff;
@@ -124,6 +165,28 @@ button:disabled {
   margin: 0 auto;
   max-width: 1080px;
   padding: 64px 32px;
+  width: 100%;
+}
+
+.view-welcome .topbar {
+  background: rgb(16 20 27 / 0.42);
+  border-bottom-color: rgb(255 255 255 / 0.12);
+}
+
+.view-welcome .topbar h1,
+.view-welcome .topbar p,
+.view-welcome .welcome-copy h2 {
+  color: #ffffff;
+}
+
+.view-welcome .welcome-copy p {
+  color: rgb(255 255 255 / 0.76);
+}
+
+.view-welcome .ghost {
+  background: rgb(255 255 255 / 0.12);
+  border-color: rgb(255 255 255 / 0.2);
+  color: #ffffff;
 }
 
 .welcome h2 {
@@ -150,6 +213,12 @@ button:disabled {
 
 .start-panel p {
   font-size: 14px;
+}
+
+.view-welcome .start-panel {
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.28);
+  backdrop-filter: blur(20px);
 }
 
 .start-panel h3 {
