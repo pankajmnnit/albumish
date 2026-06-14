@@ -342,7 +342,7 @@ h3 {
   aspect-ratio: 1.23;
   background:
     linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / 0.18)),
-    url("./albumish-preview.png") var(--photo-position, center) / var(--photo-size, 230%) no-repeat,
+    var(--photo) var(--photo-position, center) / var(--photo-size, cover) no-repeat,
     #eef1f7;
   border: 1px solid rgb(0 0 0 / 0.08);
   border-radius: var(--radius);
@@ -354,48 +354,48 @@ h3 {
 }
 
 .mock-grid .tile-1 {
-  --photo-position: 8% 12%;
-  --photo-size: 250%;
+  --photo-position: 50% 38%;
+  --photo-size: cover;
 }
 
 .mock-grid .tile-2 {
-  --photo-position: 50% 16%;
-  --photo-size: 260%;
+  --photo-position: 50% 48%;
+  --photo-size: cover;
 }
 
 .mock-grid .tile-3 {
-  --photo-position: 84% 12%;
-  --photo-size: 250%;
+  --photo-position: 52% 42%;
+  --photo-size: cover;
 }
 
 .mock-grid .tile-4 {
-  --photo-position: 14% 52%;
-  --photo-size: 245%;
+  --photo-position: 50% 50%;
+  --photo-size: cover;
 }
 
 .mock-grid .tile-5 {
   --photo-position: 50% 50%;
-  --photo-size: 245%;
+  --photo-size: cover;
 }
 
 .mock-grid .tile-6 {
-  --photo-position: 86% 52%;
-  --photo-size: 245%;
+  --photo-position: 58% 54%;
+  --photo-size: 145%;
 }
 
 .mock-grid .tile-7 {
-  --photo-position: 14% 88%;
-  --photo-size: 250%;
+  --photo-position: 46% 56%;
+  --photo-size: 135%;
 }
 
 .mock-grid .tile-8 {
-  --photo-position: 52% 88%;
-  --photo-size: 250%;
+  --photo-position: 42% 48%;
+  --photo-size: 150%;
 }
 
 .mock-grid .tile-9 {
-  --photo-position: 88% 88%;
-  --photo-size: 250%;
+  --photo-position: 52% 52%;
+  --photo-size: 150%;
 }
 
 .mock-grid span::after {
