@@ -591,6 +591,38 @@ footer {
   max-width: 560px;
 }
 
+.price-card {
+  background: rgb(255 255 255 / 0.72);
+  border: 1px solid rgb(0 0 0 / 0.08);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 54px rgb(20 22 28 / 0.08);
+  display: grid;
+  gap: 6px;
+  margin-top: 24px;
+  max-width: 460px;
+  padding: 20px;
+}
+
+.price-card span {
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.price-card strong {
+  font-size: clamp(24px, 3vw, 34px);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.price-card small {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .license-card {
   padding: clamp(24px, 4vw, 34px);
 }
