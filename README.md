@@ -6,11 +6,11 @@ Albumish is the fastest way to shortlist event photos. The desktop app helps use
 
 ## Download Links
 
-The page currently points to the latest `v0.1.1` GitHub Release asset URLs:
+The page currently points to the latest `v0.1.2` GitHub Release asset URLs:
 
 ```text
-https://github.com/pankajmnnit/albumish/releases/latest/download/Albumish-0.1.1-arm64.dmg
-https://github.com/pankajmnnit/albumish/releases/latest/download/Albumish.Setup.0.1.1.exe
+https://github.com/pankajmnnit/albumish/releases/latest/download/Albumish-0.1.2-arm64.dmg
+https://github.com/pankajmnnit/albumish/releases/latest/download/Albumish.Setup.0.1.2.exe
 ```
 
 When you create a GitHub release, upload your installer files with exactly these names, or update the links in `index.html`.
@@ -18,8 +18,8 @@ When you create a GitHub release, upload your installer files with exactly these
 Recommended release asset names:
 
 ```text
-Albumish-0.1.1-arm64.dmg
-Albumish.Setup.0.1.1.exe
+Albumish-0.1.2-arm64.dmg
+Albumish.Setup.0.1.2.exe
 ```
 
 The current Mac link is for Apple Silicon. The Windows link is for x64 Windows 10/11. For Intel Macs, publish an x64 Mac build or a universal Mac build and add another button.
