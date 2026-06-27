@@ -584,6 +584,34 @@ footer {
   padding: 15px 17px;
 }
 
+.demo-section {
+  padding-top: 8px;
+}
+
+.video-frame {
+  background: #111114;
+  border: 1px solid rgb(255 255 255 / 0.8);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-top: 30px;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-frame::before {
+  content: "";
+  display: block;
+  padding-top: 56.25%;
+}
+
+.video-frame iframe {
+  border: 0;
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
 .ai-beta-section {
   padding-top: 8px;
 }
